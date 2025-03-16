@@ -3,12 +3,21 @@ from torch import nn
 import torchvision.utils as vutils
 import matplotlib.pyplot as plt
 import numpy as np
+import urllib.request  # For downloading model from GitHub
+import os
+import streamlit as st
 
 # ==== CONFIGURATION ====
-MODEL_PATH = "C:\\Users\\DELL\\Downloads\\generator_epoch_26.pth"  # Path to saved generator model
-INPUT_VECTOR_DIM = 100        # Same latent vector size used during training
-IMG_SIZE = 64                 # Output image size
+MODEL_URL = "https://raw.githubusercontent.com/HibaAbrar/DCGAN_Face_Generator/generator_epoch_26.pth"
+MODEL_PATH = "generator_epoch_26.pth"
+INPUT_VECTOR_DIM = 100
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+
+# ==== DOWNLOAD MODEL IF NOT EXISTS ====
+if not os.path.exists(MODEL_PATH):
+    st.info("Downloading model... This may take a few seconds.")
+    urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
+
 
 # ==== GENERATOR MODEL (MUST MATCH TRAINING DEFINITION) ====
 class Generator(nn.Module):
@@ -40,8 +49,8 @@ class Generator(nn.Module):
 
 # ==== LOAD TRAINED GENERATOR ====
 generator = Generator(INPUT_VECTOR_DIM).to(DEVICE)
-# generator.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE))
-generator.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE, weights_only=True))
+generator.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE))
+# generator.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE, weights_only=True))
 generator.eval()
 
 # # ==== GENERATE IMAGES ====
@@ -72,7 +81,7 @@ generator.eval()
 #     plt.imshow(img)
 #     plt.show()
 
-import streamlit as st
+
 
 def generate_images():
     noise = torch.randn(1, INPUT_VECTOR_DIM, 1, 1, device=DEVICE)
