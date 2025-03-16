@@ -1,5 +1,6 @@
+streamlit
 torch
 torchvision
-streamlit
 matplotlib
 numpy
+urllib3  # Ensures smooth URL downloads
